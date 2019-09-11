@@ -1,13 +1,13 @@
 # Compile Info
-CC := g++
-SRCEXT := cpp
-CFLAGS := -O2 -std=c++11 -pthread -g -Wall
+CC := gcc
+SRCEXT := c
+CFLAGS := -O2 -std=c11 -pthread -g -Wall
 INCDIR := -I include
 
 # Source Info, target = cpplox, entry should be in cpplox.cpp
 SRCDIR := src
 BINDIR := bin
-TARGET := cpplox
+TARGET := main
 SOURCES := $(shell find $(SRCDIR) -type f -iname "*.$(SRCEXT)" ! -iname "$(TARGET).$(SRCEXT)")
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BINDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 
