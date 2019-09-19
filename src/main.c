@@ -1,11 +1,14 @@
 #include "common.h"
 #include "chunk.h"
 #include "debug.h"
+#include "vm.h"
 
 #include <stdio.h>
 
 int main(int argc, const char* argv[])
 {
+    initVM();
+
     Chunk chunk;
     initChunk(&chunk);
     //
@@ -32,6 +35,8 @@ int main(int argc, const char* argv[])
     //         chunk.lineRecordList.lineRecords[lineRecordIndex].offsetPerLine);
     // }
     
+    interpret(&chunk);
+    freeVM();
     freeChunk(&chunk);
 
     return 0;
