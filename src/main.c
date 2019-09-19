@@ -20,7 +20,7 @@ int main(int argc, const char* argv[])
     writeConstant(&chunk, 5.7, 8);
     int tmp = 312;
     while(tmp--)
-        writeConstant(&chunk, tmp, 19);
+        writeConstant(&chunk, tmp, 315 - tmp);
 
     disassembleChunk(&chunk, "test chunk");
 
