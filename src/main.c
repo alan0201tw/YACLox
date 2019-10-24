@@ -12,28 +12,30 @@ int main(int argc, const char* argv[])
     Chunk chunk;
     initChunk(&chunk);
     //
-    writeChunk(&chunk, OP_RETURN, 0);
-    writeConstant(&chunk, 1.1, 1);
-    writeChunk(&chunk, OP_RETURN, 2);
-    writeConstant(&chunk, 2.3, 3);
-    writeChunk(&chunk, OP_RETURN, 3);
+    
+    int constant = addConstant(&chunk, 1.22);
+    writeChunk(&chunk, OP_CONSTANT, 1);
+    writeChunk(&chunk, constant, 1);
 
-    writeConstant(&chunk, 5.7, 8);
-    writeConstant(&chunk, 5.7, 8);
-    writeConstant(&chunk, 5.7, 8);
-    int tmp = 312;
-    while(tmp--)
-        writeConstant(&chunk, tmp, 315 - tmp);
+    constant = addConstant(&chunk, 3.4);
+    writeChunk(&chunk, OP_CONSTANT, 123);
+    writeChunk(&chunk, constant, 123);
+
+    writeChunk(&chunk, OP_ADD, 123);
+
+    constant = addConstant(&chunk, 5.6);
+    writeChunk(&chunk, OP_CONSTANT, 123);
+    writeChunk(&chunk, constant, 123);
+
+    writeChunk(&chunk, OP_DIVIDE, 123);
+
+    writeChunk(&chunk, OP_NEGATE, 3);
+    writeChunk(&chunk, OP_RETURN, 1);
+
+    // writeChunk(&chunk, OP_NEGATE, 3);
+    // writeChunk(&chunk, OP_RETURN, 3);
 
     disassembleChunk(&chunk, "test chunk");
-
-    // for(int lineRecordIndex = 0; lineRecordIndex < chunk.lineRecordList.count; lineRecordIndex++)
-    // {
-    //     printf("line record[%d] : lineNumber = %d, instructionPerLine = %d \n", 
-    //         lineRecordIndex, 
-    //         chunk.lineRecordList.lineRecords[lineRecordIndex].lineNumber,
-    //         chunk.lineRecordList.lineRecords[lineRecordIndex].offsetPerLine);
-    // }
     
     interpret(&chunk);
     freeVM();
