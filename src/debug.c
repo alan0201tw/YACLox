@@ -2,22 +2,7 @@
 
 #include "debug.h"
 #include "value.h"
-
-static int getLine(Chunk* chunk, int offset)
-{
-    int offsetLeft = offset;
-    for(int lineRecordIndex = 0; lineRecordIndex < chunk->lineRecordList.count; lineRecordIndex++)
-    {
-        if(chunk->lineRecordList.lineRecords[lineRecordIndex].offsetPerLine > offsetLeft)
-        {
-            return chunk->lineRecordList.lineRecords[lineRecordIndex].lineNumber;
-        }
-        offsetLeft -= chunk->lineRecordList.lineRecords[lineRecordIndex].offsetPerLine;
-    }
-
-    printf("Error : getLine returns -1 \n");
-    return -1;
-}
+#include "vm.h"
 
 void disassembleChunk(Chunk* chunk, const char* name)
 {
