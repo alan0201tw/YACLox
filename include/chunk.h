@@ -7,12 +7,23 @@
 typedef enum
 {
     OP_CONSTANT,
+    // - bool value type
+    OP_NIL,
+    OP_TRUE,
+    OP_FALSE,
+    // end of - bool value type
+    // - equality and comparison operators
+    OP_EQUAL,
+    OP_GREATER,
+    OP_LESS,
+    // end of - equality and comparison operators
     // - arithmetic
     OP_ADD,
     OP_SUBTRACT,
     OP_MULTIPLY,
     OP_DIVIDE,
-    OP_NEGATE,
+    OP_NOT, // !
+    OP_NEGATE, // -
     // end of - arithmetic
     OP_CONSTANT_LONG,
     OP_RETURN,

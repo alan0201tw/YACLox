@@ -125,7 +125,7 @@ static TokenType checkKeyword(int start, int length,
     const char* rest, TokenType type)
 {
     if(scanner.current - scanner.start == start + length &&
-       memcpy(scanner.start + start, rest, length) == 0)
+       memcmp(scanner.start + start, rest, length) == 0)
     {
         return type;
     }
@@ -135,7 +135,7 @@ static TokenType checkKeyword(int start, int length,
 
 static TokenType identifierType()
 {
-    switch(scanner.current[0])
+    switch(scanner.start[0])
     {
         // easy keywords with no branching
         case 'a': return checkKeyword(1, 2, "nd", TOKEN_AND);
