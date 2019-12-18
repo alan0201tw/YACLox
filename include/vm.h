@@ -27,6 +27,11 @@ typedef struct
     // Since the stack grows and shrinks as values are pushed and popped, 
     // we need to track where the top of the stack is in the array
     Value* stackTop;
+
+    // a linked-list of Lox objects, which are allocated on heap
+    // garbage collection is needed in order to avoid memory leak
+    Obj* objects;
+
 } VM;
 
 typedef enum
@@ -35,6 +40,8 @@ typedef enum
     INTERPRET_COMPILE_ERROR,
     INTERPRET_RUNTIME_ERROR
 } InterpretResult;
+
+extern VM vm;
 
 void initVM();
 void freeVM();

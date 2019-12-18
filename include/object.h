@@ -17,6 +17,10 @@ typedef enum
 struct sObj
 {
     ObjType type;
+    // adding this pointer allows us to use this struct as a linked-list node
+    // and by connecting every Lox object within this list, it's easier to
+    // traverse every object and do GC
+    struct sObj* next;
 };
 
 // Reference : 
@@ -29,10 +33,16 @@ struct sObjString
     // access sObj's member field safely.
     Obj obj;
     int length;
-    char* chars;
+    // char* chars;
+
+    // Reference : https://en.wikipedia.org/wiki/Flexible_array_member
+    char chars[];
 };
 
+// this just takes in a c-string and construct a lox string out of it
+ObjString* takeString(char* chars, int length);
 ObjString* copyString(const char* chars, int length);
+void printObject(Value value);
 
 // Why use a function rather than macro?
 //
