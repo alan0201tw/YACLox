@@ -35,6 +35,9 @@ struct sObjString
     int length;
     // char* chars;
 
+    // for hash table key caching
+    uint32_t hash;
+
     // Reference : https://en.wikipedia.org/wiki/Flexible_array_member
     char chars[];
 };
