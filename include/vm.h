@@ -2,6 +2,7 @@
 #define clox_vm_h
 
 #include "chunk.h"
+#include "table.h"
 #include "value.h"
 
 // add parentheses around the numerical value to avoid any tragic shenanigans
@@ -27,6 +28,8 @@ typedef struct
     // Since the stack grows and shrinks as values are pushed and popped, 
     // we need to track where the top of the stack is in the array
     Value* stackTop;
+    // For string interning
+    Table strings;
 
     // a linked-list of Lox objects, which are allocated on heap
     // garbage collection is needed in order to avoid memory leak

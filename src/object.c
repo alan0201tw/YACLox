@@ -3,6 +3,7 @@
 
 #include "memory.h"
 #include "object.h"
+#include "table.h"
 #include "value.h"
 #include "vm.h"
 
@@ -41,6 +42,17 @@ static ObjString* allocateString(char* chars, int length, uint32_t hash)
 
     string->hash = hash;
 
+    // Use the hash-table as a hash-set, where only key matters
+    // This is basically a unordered_set in C++
+    //
+    // Reference : https://www.geeksforgeeks.org/unordered_set-in-cpp-stl/
+    // 
+    // An unordered_set is implemented using a hash table where keys are 
+    // hashed into indices of a hash table so that the insertion is always 
+    // randomized.
+
+    tableSet(&vm.strings, string, NIL_VAL);
+
     return string;
 }
 
@@ -67,12 +79,28 @@ ObjString* takeString(char* chars, int length)
 {
     uint32_t hash = hashString(chars, length);
 
+    // If we find it, before we return it, 
+    // we free the memory for the string that was passed in. 
+    ObjString* interned = tableFindString(&vm.strings, chars, length, hash);
+    if (interned != NULL)
+    {
+        FREE_ARRAY(char, chars, length + 1);
+        return interned;
+    }
+
+    // from an allocated c-string, allocate a lox-string
     return allocateString(chars, length, hash);
 }
 
 ObjString* copyString(const char* chars, int length)
 {
     uint32_t hash = hashString(chars, length);
+
+    // Check if this string is interned yet, 
+    // if so, simply return the interned string;
+    // instead of “copying”, we just return a reference to that string
+    ObjString* interned = tableFindString(&vm.strings, chars, length, hash);
+    if (interned != NULL) return interned;
 
     char* heapChars = ALLOCATE(char, length + 1);
     memcpy(heapChars, chars, length);

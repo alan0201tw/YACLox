@@ -53,14 +53,18 @@ bool valuesEqual(Value a, Value b)
         case VAL_BOOL:   return AS_BOOL(a) == AS_BOOL(b);
         case VAL_NIL:    return true;
         case VAL_NUMBER: return AS_NUMBER(a) == AS_NUMBER(b);
-        case VAL_OBJ:
-        {
-            ObjString* aString = AS_STRING(a);
-            ObjString* bString = AS_STRING(b);
+        // case VAL_OBJ:
+        // {
+        //     ObjString* aString = AS_STRING(a);
+        //     ObjString* bString = AS_STRING(b);
 
-            return aString->length == bString->length &&
-                memcmp(aString->chars, bString->chars, aString->length) == 0;
-        }
+        //     return aString->length == bString->length &&
+        //         memcmp(aString->chars, bString->chars, aString->length) == 0;
+        // }
+        
+        // Since all strings are interned, we can just perform address check
+        // on string equality test.
+        case VAL_OBJ:    return AS_OBJ(a) == AS_OBJ(b);
 
         default:
             printf("valuesEqual not covering <a> value type : %d \n", a.type);
