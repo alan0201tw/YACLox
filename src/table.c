@@ -25,6 +25,8 @@ void freeTable(Table* table)
 static Entry* findEntry(Entry* entries, int capacity, ObjString* key)
 {            
     uint32_t index = key->hash % capacity;
+    Entry* tombstone = NULL;
+
     for (;;)
     {
         Entry* entry = &entries[index];
@@ -32,8 +34,28 @@ static Entry* findEntry(Entry* entries, int capacity, ObjString* key)
         // since the hash table grows when nearly full, 
         // this can never result in an infinite loop, since there
         // will always be an empty entry.
-        if (entry->key == key || entry->key == NULL)
+
+        // if (entry->key == key || entry->key == NULL)
+        // {
+        //     return entry;
+        // }
+
+        if (entry->key == NULL)
         {
+            if (IS_NIL(entry->value))
+            {
+                // Empty entry.
+                return tombstone != NULL ? tombstone : entry;
+            }
+            else // entry->value == BOOL_VAL(true)
+            {
+                // We found a tombstone.
+                if (tombstone == NULL) tombstone = entry;
+            }
+        }
+        else if (entry->key == key)
+        {
+            // We found the key.
             return entry;
         }
 
@@ -52,6 +74,7 @@ static void adjustCapacity(Table* table, int capacity)
         entries[i].value = NIL_VAL;
     }
 
+    table->count = 0;
     // re-inserting every entry in the original hash table to the new one
     for (int i = 0; i < table->capacity; i++)
     {
@@ -61,12 +84,24 @@ static void adjustCapacity(Table* table, int capacity)
         Entry* dest = findEntry(entries, capacity, entry->key);
         dest->key = entry->key;
         dest->value = entry->value;
+        table->count++;
     }
 
     // free the old array / hash table
     FREE_ARRAY(Entry, table->entries, table->capacity);
     table->entries = entries;
     table->capacity = capacity;
+}
+
+bool tableGet(Table* table, ObjString* key, Value* value)
+{
+    if (table->count == 0) return false;
+
+    Entry* entry = findEntry(table->entries, table->capacity, key);
+    if (entry->key == NULL) return false;
+
+    *value = entry->value;
+    return true;
 }
 
 bool tableSet(Table* table, ObjString* key, Value value)
@@ -79,8 +114,10 @@ bool tableSet(Table* table, ObjString* key, Value value)
 
     Entry* entry = findEntry(table->entries, table->capacity, key);
 
-    bool isNewKey = entry->key == NULL;
-    if (isNewKey) table->count++;
+    bool isNewKey = (entry->key == NULL);
+    // if entry->key == NULL and value is not null, it is a tombstone
+    // which will be considered a full bucket when computing load factor
+    if (isNewKey && IS_NIL(entry->value)) table->count++;
 
     entry->key = key;
     entry->value = value;
@@ -98,4 +135,19 @@ void tableAddAll(Table* from, Table* to)
             tableSet(to, entry->key, entry->value);
         }
     }
+}
+
+bool tableDelete(Table* table, ObjString* key)
+{
+    if (table->count == 0) return false;
+
+    // Find the entry.
+    Entry* entry = findEntry(table->entries, table->capacity, key);
+    if (entry->key == NULL) return false;
+
+    // Place a tombstone in the entry.
+    entry->key = NULL;
+    entry->value = BOOL_VAL(true);
+
+    return true;
 }
